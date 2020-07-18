@@ -244,10 +244,11 @@ package main
 import "fmt"
 
 func main() {
-    text1 := "Go語言"
-    text2 := "Cool"
+    text1 := "Go 語言 "
+    text2 := "Nice"
     var text3 string
-    fmt.Println(text1 + text2) // Go語言Cool
+
+    fmt.Println(text1 + text2) // Go 語言 Nice
     fmt.Printf("%q\n", text3)  // ""
     fmt.Println(text1 > text2) // true
 }
@@ -272,6 +273,7 @@ func main() {
     var scores [10]int
     scores[0] = 90
     scores[1] = 89
+
     fmt.Println(scores)      // [90 89 0 0 0 0 0 0 0 0]
     fmt.Println(len(scores)) // 10
 }
@@ -287,6 +289,7 @@ import "fmt"
 
 func main() {
     arr := [...]int{1, 2, 3}
+
     for i := 0; i < len(arr); i++ {
         fmt.Printf("%d\n", arr[i])
     }
@@ -302,6 +305,7 @@ import "fmt"
 
 func main() {
     arr := [...]int{1, 2, 3}
+
     for index, element := range arr {
         fmt.Printf("%d: %d\n", index, element)
     }
@@ -323,11 +327,14 @@ import "fmt"
 func main() {
     s1 := make([]int, 5)
     s2 := s1
+
     fmt.Println(s1) // [0 0 0 0 0]
     fmt.Println(s2) // [0 0 0 0 0]
+
     s1[0] = 1
     fmt.Println(s1) // [1 0 0 0 0]
     fmt.Println(s2) // [1 0 0 0 0]
+
     s2[1] = 2
     fmt.Println(s1) // [1 2 0 0 0]
     fmt.Println(s2) // [1 2 0 0 0]
@@ -352,12 +359,14 @@ func main() {
     fmt.Println(passwords)      // map[]
     fmt.Println(len(passwords)) // 0
 
-    passwords["caterpillar"] = 123456
-    passwords["monica"] = 54321
-    fmt.Println(passwords)                // map[caterpillar:123456 monica:54321]
+    passwords["walter1"] = 123456
+    passwords["walter2"] = 654321
+
+    fmt.Println(passwords)                // map[walter1:123456 walter2:654321]
     fmt.Println(len(passwords))           // 2
-    fmt.Println(passwords["caterpillar"]) // 123456
-    fmt.Println(passwords["monica"])      // 54321
+
+    fmt.Println(passwords["walter1"]) // 123456
+    fmt.Println(passwords["walter2"]) // 654321
 }
 ```
 
@@ -382,8 +391,9 @@ package main
 import "fmt"
 
 func main() {
-    input := 10
+    input := 12
     remain := input % 2
+
     if remain == 1 {
         fmt.Printf("%d 為奇數\n", input)
     } else {
@@ -406,13 +416,12 @@ import "fmt"
 
 func main() {
     var level rune
-    score := 88
+    score := 89
 
     switch score / 10 {
     case 10, 9:
         level = 'A'
     case 8:
-
         level = 'B'
     case 7:
         level = 'C'
@@ -421,6 +430,7 @@ func main() {
     default:
         level = 'E'
     }
+
     fmt.Printf("得分等級：%c\n", level)
 }
 
