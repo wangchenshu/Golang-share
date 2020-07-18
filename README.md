@@ -519,3 +519,302 @@ func main() {
 
 ```
 
+### 可變參數
+在呼叫方法時，若方法的引數個數事先無法決定該如何處理？
+在 Go 中支援不定長度引數（Variable-length Argument），
+可以輕鬆的解決這個問題。直接來看示範：
+
+
+```
+package main
+
+import "fmt"
+
+func Sum(numbers ...int) int {
+    var sum int
+
+    for _, number := range numbers {
+        sum += number
+    }
+
+    return sum
+}
+
+func main() {
+    fmt.Println(Sum(1, 2))          // 3
+    fmt.Println(Sum(1, 2, 3))       // 6
+    fmt.Println(Sum(1, 2, 3, 4))    // 10
+    fmt.Println(Sum(1, 2, 3, 4, 5)) // 15
+}
+
+```
+
+可以看到，要使用不定長度引數，宣告參數時要於型態關鍵字前加上 ...，
+此參數本質上是個 slice，因此可以使用 for range 來走訪元素，
+可接受可變長度的參數只能有一個，而必須是最後一個參數。
+
+### 函式與指標
+Go 語言有指標，因此，在變數傳遞就多了一種選擇，直接來看個例子，以下的執行結果會顯示 1：
+
+
+```
+package main
+
+import "fmt"
+
+func add1To(n int) {
+    n = n + 1
+}
+
+func main() {
+    number := 1
+    add1To(number)
+    fmt.Println(number) // 1
+}
+```
+
+
+這應該沒有問題，因為傳遞的是變數值給 n，函式中 n 的值加上 1 之後，
+再指定回給 n，這對 main 中的 number 變數毫無影響，因此函式結束後，
+顯示 number 的值，仍舊是 1。
+
+那麼來看下面這個例子：
+
+
+```
+package main
+
+import "fmt"
+
+func add1To(n *int) {
+    *n = *n + 1
+}
+
+func main() {
+    number := 1
+    add1To(&number)
+    fmt.Println(number) // 2
+}
+```
+
+
+這次使用了 &number 取得 number 的位址值再傳遞給 n，也就是傳遞了變數位址值給 n，
+函式中使用 *n 取得位址處的值，加上 1 後再將值存回原位址處，
+因此，透過 main 函式中的 number 取得的值，也會是加 1 後的值。
+
+
+## 一級函式
+
+作為一門現代語言，Go 的特色之一是函式為一級函式（First-class function），可以作為值來進行傳遞。
+
+### 函式作為值
+例如你定義一個取最大值的函式 max，你可以將此函式作為值傳遞給 maximum：
+
+
+```
+package main
+
+import "fmt"
+
+func max(a, b int) int {
+    if a > b {
+        return a
+    }
+
+    return b
+}
+
+func main() {
+    maximum := max
+
+    fmt.Println(max(10, 5))     // 10
+    fmt.Println(maximum(10, 5)) // 10
+}
+```
+
+
+可以看到，被 max 參考的函式，也被 maximum 參考著，因而，
+現在透過 max 或者 maximum，都可以呼叫函式。
+
+因為 Go 型態推斷能力的關係，上頭的 maximum 並不用宣告型態，
+而可以直接參考 max 函式的型態，那麼，max 或者是 maximum 的型態是什麼呢？
+
+```
+package main
+
+import "fmt"
+import "reflect"
+
+func max(a, b int) int {
+    if a > b {
+        return a
+    }
+
+    return b
+}
+
+func main() {
+    maximum := max
+
+    fmt.Println(reflect.TypeOf(max))     // func(int, int) int
+    fmt.Println(reflect.TypeOf(maximum)) // func(int, int) int
+}
+```
+
+可以看到，函式的型態包括了 func、參數型態與傳回值型態，但不用宣告函式、參數與傳回值的名稱。
+
+### 宣告函式變數
+你可以僅宣告一個變數可用來參考特定型態的函式，例如：
+
+```
+package main
+
+import "fmt"
+
+func max(a, b int) int {
+    if a > b {
+        return a
+    }
+
+    return b
+}
+
+func main() {
+    var maximum func(int, int) int
+    fmt.Println(maximum) // nil
+
+    maximum = max
+    fmt.Println(maximum(10, 5)) // 10
+}
+```
+
+若想先宣告一個 maximum 變數，可以在之後參考 max 函式，
+可以使用型態 func(int, int) int 來宣告，通常，宣告函式變數時，
+若想免於冗長的函式型態宣告，可以使用 type 來定義一個新的型態名稱：
+
+```
+package main
+
+import "fmt"
+
+type BiFunc func(int, int) int // 定義了新型態
+
+func max(a, b int) int {
+    if a > b {
+        return a
+    }
+
+    return b
+}
+
+func main() {
+    var maximum BiFunc
+    fmt.Println(maximum) // nil
+
+    maximum = max
+    fmt.Println(maximum(10, 5)) // 10
+}
+```
+
+在上例中，BiFunc 是個新的定義型態（defined type），
+底層型態（underlying type）為 func(int, int) int，
+Go 會認定兩者屬於不同型態，因為新的型態會擁有新的名稱，
+在 Go 1.9 前，這是避免冗長函式型態宣告的唯一方式。
+
+不過，就這邊來說，實際上只是想要 func(int, int) int 能有個簡短一點的名稱，
+從 Go 1.9 開始，可以為型態取別名，別名就只是同一型態的另一個名稱，：
+
+```
+package main
+
+import "fmt"
+
+type BiFunc = func(int, int) int // 型態別名宣告
+
+func max(a, b int) int {
+    if a > b {
+        return a
+    }
+
+    return b
+}
+
+func main() {
+    var maximum BiFunc
+    fmt.Println(maximum) // nil
+
+    maximum = max
+    fmt.Println(maximum(10, 5)) // 10
+}
+```
+
+在這邊，BiFunc 只是 func(int, int) int 的另一個名稱，而不是新的型態。
+
+函式變數既然是個變數，也就可以對它取指標，例如：
+
+```
+package main
+
+import "fmt"
+
+type BiFunc = func(int, int) int
+
+func max(a, b int) int {
+    if a > b {
+        return a
+    }
+
+    return b
+}
+
+func main() {
+    var maximum BiFunc
+    fmt.Println(&maximum) // 0x1040a130
+    // fmt.Println(&max)
+}
+```
+
+### 回呼應用
+因為函式可以當作值傳遞，因此，對於函式中流程幾乎相同，
+只有少數操作不同的情況，就可以將操作不同的部份以回呼（Callback）函式取代。
+例如，可以設計一個 filter 函式，用來過濾出符合特定條件的值：
+
+```
+package main
+
+import "fmt"
+
+type Predicate = func(int) bool
+
+func filter(origin []int, predicate Predicate) []int {
+    filtered := []int{}
+
+    for _, elem := range origin {
+        if predicate(elem) {
+            filtered = append(filtered, elem)
+        }
+    }
+
+    return filtered
+}
+
+func greaterThan7(n int) bool {
+    return n > 7
+}
+
+func lessThan5(n int) bool {
+    return n < 5
+}
+
+func main() {
+    data := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+    fmt.Println(filter(data, greaterThan7))
+    fmt.Println(filter(data, lessThan5))
+}
+```
+
+在這個例子中，filter 函式重用了 for range 與 if 等流程，只要傳入過濾用的函式，就可以讓 filter 具有各種的過濾用途。
+
+除了作為值傳遞之外，Go 的函式還可以是匿名函式，且具有閉包（Closure）的特性，這將在下一篇文件加以說明。
+
