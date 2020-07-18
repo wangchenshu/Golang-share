@@ -489,4 +489,23 @@ func main() {
 
 ```
 
+### 多個傳回值
+Go 中允許多個傳回值，例如，定義一個函式，可傳回2個元素：
+
+
+```
+package main
+
+import fmt
+
+func GetNums() (int, int) {
+    return 1, 2
+}
+
+func main() {
+    num1, num2 := GetNums()
+    fmt.Println(num1, num2)
+}
+
+```
 
