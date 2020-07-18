@@ -457,3 +457,36 @@ func main() {
 ... 詳細請自行爬文 ^_^
 
 
+## 函式入門
+
+在 Go 中要定義函式，是使用 func 來定義，其基本格式如下：
+
+```
+func funcName(param1 type1, param2 type2) (return1 type1, return2 type2) {
+    // 一些程式碼...
+    return value1, value2
+}
+```
+
+### 定義函式
+可以看到，Go 定義函式時，參數的型態宣告同樣地是放在名稱之後，如果多個參數有同樣的型態，
+那麼只要最右邊同型態的名稱右方加上型態就可以了，比較特別的地方在於，可以有兩個以上的傳回值，且傳回值可以設定名稱。
+
+來看個簡單的函式定義，
+
+```
+package main
+
+import fmt
+
+func SayHello() {
+    fmt.Println("Hello")
+}
+
+func main() {
+  SayHello()
+}
+
+```
+
+
