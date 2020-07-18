@@ -313,7 +313,7 @@ func main() {
 在〈身為複合值的陣列〉中看過陣列，有的場合需要陣列，然而，若只想處理陣列中某片區域，或者以更高階的觀點看待一片資料（而不是從固定長度的陣列觀點），那麼可以使用 slice。
 
 ### 建立一個 slice
-如果需要一個 slice，可以使用 make 函式，舉個例子來說，可以如下建立一個長度與容量皆為 5 的 slice，並傳回 slice 的參考，型態為 []int：
+> 如果需要一個 slice，可以使用 make 函式，舉個例子來說，可以如下建立一個長度與容量皆為 5 的 slice，並傳回 slice 的參考，型態為 []int：
 
 ```
 package main
@@ -334,4 +334,98 @@ func main() {
 }
 ```
 
-... 詳細請自行爬文， ^_^
+... 詳細請自行爬文 ^_^
+
+## 成對鍵值的 map
+> 許多語言中都會有的成對鍵值資料結構，在 Go 中是以內建型態 map 來實作，格式為 map[keyType]valueType。
+
+### 建立與初始 map
+想要建立例一個 map 實例，但尚無任何鍵值對，可以使用 make 函式，例如：
+
+```
+package main
+
+import "fmt"
+
+func main() {
+    passwords := make(map[string]int)
+    fmt.Println(passwords)      // map[]
+    fmt.Println(len(passwords)) // 0
+
+    passwords["caterpillar"] = 123456
+    passwords["monica"] = 54321
+    fmt.Println(passwords)                // map[caterpillar:123456 monica:54321]
+    fmt.Println(len(passwords))           // 2
+    fmt.Println(passwords["caterpillar"]) // 123456
+    fmt.Println(passwords["monica"])      // 54321
+}
+```
+
+在上例中，passwords 是個參考，指向 make(map[string]int) 建立的 map 實例。
+
+... 詳細請自行爬文 ^_^
+
+## 運算子
+
+... 詳細請自行爬文 ^_^
+
+## if..else、switch 條件式
+在分支判斷的控制上，Go 提供了 if...else、switch 語法，相較於其他提供類似語法的語言，在 Go 中 if...else、switch 語法的相似性更高。
+
+### if..else 語法
+直接來看個 if..else 的實例：
+
+
+```
+package main
+
+import "fmt"
+
+func main() {
+    input := 10
+    remain := input % 2
+    if remain == 1 {
+        fmt.Printf("%d 為奇數\n", input)
+    } else {
+        fmt.Printf("%d 為偶數\n", input)
+    }
+}
+```
+
+在 Go 中，if 之後直接寫判斷式可以不用使用 () 括號，而 {} 是必要的，
+這樣應該是比較能避免 Apple 曾經發生某個函式中有兩個連續縮排而引發的問題.
+
+### switch 語法
+實際上，對於上頭的範例，可以改用 switch 來撰寫，程式會更為簡潔：
+
+
+```
+package main
+
+import "fmt"
+
+func main() {
+    var level rune
+    score := 88
+
+    switch score / 10 {
+    case 10, 9:
+        level = 'A'
+    case 8:
+
+        level = 'B'
+    case 7:
+        level = 'C'
+    case 6:
+        level = 'D'
+    default:
+        level = 'E'
+    }
+    fmt.Printf("得分等級：%c\n", level)
+}
+
+```
+
+... 詳細請自行爬文 ^_^
+
+
