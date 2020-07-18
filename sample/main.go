@@ -5,6 +5,10 @@ import (
 	"sample/hello"
 )
 
+func GetNums() (int, int) {
+	return 1, 2
+}
+
 func main() {
 	helloStr := hello.SayHello()
 	fmt.Println(helloStr)
@@ -22,4 +26,7 @@ func main() {
 	fmt.Println(text1 + text2) // Go語言Cool
 	fmt.Printf("%q\n", text3)  // ""
 	fmt.Println(text1 > text2) // true
+
+	num1, num2 := GetNums()
+	fmt.Println(num1, num2)
 }
