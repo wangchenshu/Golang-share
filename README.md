@@ -1312,3 +1312,184 @@ $T{} 的寫法與 new(T) 是等效的，使用 &Point{10, 20} 這類的寫法，
 
 ## 結構與方法
 
+在〈結構入門〉中看過，有些資料會有相關性，相關聯的資料組織在一起，對於資料本身的可用性或者是程式碼的可讀性，都會有所幫助，實際上，有些資料與可處理它的函式也會有相關性，將相關聯的資料與函式組織在一起，對資料與函式本身的可用性或者是程式碼的可讀性，也有著極大的幫助。
+
+### 建立方法
+假設可能原本有如下的程式內容，負責銀行帳戶的建立、存款與提款：
+
+```
+package main
+
+import (
+    "errors"
+    "fmt"
+)
+
+type Account struct {
+    id      string
+    name    string
+    balance float64
+}
+
+func Deposit(account *Account, amount float64) {
+    if amount <= 0 {
+        panic("必須存入正數")
+    }
+    account.balance += amount
+}
+
+func Withdraw(account *Account, amount float64) error {
+    if amount > account.balance {
+        return errors.New("餘額不足")
+    }
+    account.balance -= amount
+    return nil
+}
+
+func String(account *Account) string {
+    return fmt.Sprintf("Account{%s %s %.2f}",
+        account.id, account.name, account.balance)
+}
+
+func main() {
+    account := &Account{"8765-4321", "Walter Wang", 1000}
+    Deposit(account, 500)
+    Withdraw(account, 200)
+    fmt.Println(String(account)) // Account{8765-4321 Walter Wang 1300.00}
+}
+```
+
+實際上，Desposit、Withdraw、String 的函式操作，都是與傳入的 Account 實例有關，何不將它們組織在一起呢？
+這樣比較容易使用些，在 Go 語言中，你可以重新修改函式如下：
+
+```
+package main
+
+import (
+    "errors"
+    "fmt"
+)
+
+type Account struct {
+    id      string
+    name    string
+    balance float64
+}
+
+func (ac *Account) Deposit(amount float64) {
+    if amount <= 0 {
+        panic("必須存入正數")
+    }
+    ac.balance += amount
+}
+
+func (ac *Account) Withdraw(amount float64) error {
+    if amount > ac.balance {
+        return errors.New("餘額不足")
+    }
+    ac.balance -= amount
+    return nil
+}
+
+func (ac *Account) String() string {
+    return fmt.Sprintf("Account{%s %s %.2f}",
+        ac.id, ac.name, ac.balance)
+}
+
+func main() {
+    account := &Account{"8765-4321", "Walter Wang", 1000}
+    account.Deposit(500)
+    account.Withdraw(200)
+    fmt.Println(account.String()) // Account{8765-4321 Walter Wang 1300.00}
+}
+```
+
+簡單來說，只是將函式的第一個參數，移至方法名稱之前成為函式呼叫的接收者（Receiver），這麼一來，
+就可以使用 account.Deposit(500)、account.Withdraw(200)、account.String() 這樣的方式來呼叫函式，
+就像是物件導向程式語言中的方法（Method）。
+
+### 值都能有方法
+實際上，不只是結構的實例可以定義方法，在 Go 語言中，只要是值，就可以定義方法，
+條件是必須是定義的型態（defined type），具體而言，就是使用 type 定義的新型態。
+
+例如，以下的範例為 []int 定義了一個新的型態名稱，並定義了一個 ForEach 方法：
+
+```
+package main
+
+import "fmt"
+
+type IntList []int
+type Funcint func(int)
+
+func (lt IntList) ForEach(f Funcint) {
+    for _, ele := range lt {
+        f(ele)
+    }
+}
+
+func main() {
+    var lt IntList = []int{10, 20, 30, 40, 50}
+    lt.ForEach(func(ele int) {
+        fmt.Println(ele)
+    })
+}
+```
+
+這個範例會顯示 10 到 50 作為結果，必須留意的是，type 定義了新型態 Funcint，
+因為 ForEach 是針對 Funcint 定義，而不是針對 []int，因此底下是行不通的：
+
+```
+lt2 := []int {10, 20, 30, 40, 50}
+
+// lt2.ForEach undefined (type []int has no field or method ForEach)
+lt2.ForEach(func(ele int) {
+    fmt.Println(ele)
+})
+```
+
+編譯器認為 []int 並沒有定義 ForEach，因此發生錯誤，想要通過編譯的話，可以進行型態轉換：
+
+```
+lt2 := IntList([]int {10, 20, 30, 40, 50})
+lt2.ForEach(func(ele int) {
+    fmt.Println(ele)
+})
+```
+
+你甚至可以基於 int 等基本型態定義方法，同樣地，必須定義一個新的型態名稱：
+
+```
+package main
+
+import (
+    "fmt"
+)
+
+type Int int
+type FuncInt func(Int)
+
+func (n Int) Times(f FuncInt) {
+    if n < 0 {
+        panic("必須是正數")
+    }
+
+    var i Int
+    for i = 0; i < n; i++ {
+        f(i)
+    }
+}
+
+func main() {
+    var x Int = 10
+    x.Times(func(n Int) {
+        fmt.Println(n)
+    })
+}
+```
+
+像這樣基於某個基本型態定義新型態，並為其定義更多高階特性，在 Go 的領域是常見的做法。
+這個範例會顯示 0 到 9，看起來就像是指定函式，要求執行 x 次吧！
+
+## 結構組合
+
