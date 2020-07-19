@@ -1491,5 +1491,137 @@ func main() {
 像這樣基於某個基本型態定義新型態，並為其定義更多高階特性，在 Go 的領域是常見的做法。
 這個範例會顯示 0 到 9，看起來就像是指定函式，要求執行 x 次吧！
 
-## 結構組合
+## 介面入門
+在〈結構與繼承〉的最後討論到了多型，倘若現在需要有個函式，可以接受 Account 與 CheckingAccount 實例，
+或者是有個陣列或 slice，可以收集 Account 與 CheckingAccount實例，那該怎麼辦呢？
+
+### 介面定義行為
+在 Go 語言中，可以使用 interface 定義行為，舉例來說，若現在想要定義儲蓄的行為，可以如下：
+
+```
+type Savings interface {
+    Deposit(amount float64)
+    Withdraw(amount float64) error
+}
+```
+
+注意，不必使用 func 關鍵字，也不用宣告接受者型態，只需要定義行為的名稱、參數與傳回值。
+接著該怎麼實現這個介面呢？實際上，就〈結構與繼承〉，已經實現了這個介面，也就是說，
+結構上不用任何關鍵字，只要有函式實現這兩個行為就可以了。
+
+因此，現在可以寫個函式，同時接受 Account 與 CheckingAccount 實例，在提款後顯示餘額：
+
+```
+package main
+
+import (
+    "errors"
+    "fmt"
+)
+
+type Savings interface {
+    Deposit(amount float64)
+    Withdraw(amount float64) error
+}
+
+type Account struct {
+    id      string
+    name    string
+    balance float64
+}
+
+func (ac *Account) Deposit(amount float64) {
+    if amount <= 0 {
+        panic("必須存入正數")
+    }
+    ac.balance += amount
+}
+
+func (ac *Account) Withdraw(amount float64) error {
+    if amount > ac.balance {
+        return errors.New("餘額不足")
+    }
+    ac.balance -= amount
+    return nil
+}
+
+type CheckingAccount struct {
+    Account
+    overdraftlimit float64
+}
+
+func (ac *CheckingAccount) Withdraw(amount float64) error {
+    if amount > ac.balance+ac.overdraftlimit {
+        return errors.New("超出信用額度")
+    }
+    ac.balance -= amount
+    return nil
+}
+
+func Withdraw(savings Savings) {
+    if err := savings.Withdraw(500); err != nil {
+        fmt.Println(err)
+    } else {
+        fmt.Println(savings)
+    }
+}
+
+func main() {
+    account1 := Account{"8765-4321", "Walter Wang", 1000}
+    account2 := CheckingAccount{Account{"8765-4321", "Walter Wang", 1000}, 30000}
+    Withdraw(&account1) // 顯示 &{8765-4321 Walter Wang 500}
+    Withdraw(&account2) // 顯示 &{{8765-4321 Walter Wang 500} 30000}
+}
+```
+
+雖然沒有定義接收者為 *CheckingAccount 的 Deposit 方法，然而，作為內部型態的 Account 有定義 
+Deposit（並且沒有使用到 CheckingAccount 定義的值域），這個實現被提昇至外部型態，也就滿足了 Savings 要求的行為規範。
+
+注意！由於在實作 Withdraw 與 Deposit 方法時，都是用指標 (ac *Account) 或 (ac *CheckingAccount) 
+宣告了接受者型態，因此傳遞實例給 func Withdraw(savings Savings) 時，也就必須傳遞指標。
+
+### 介面實例的型態與值
+如果你定義了一個變數：
+
+```
+var savings Savings
+```
+
+那麼 savings 變數儲存了什麼？技術上來說，savings 變數儲存兩個資訊：型態與值。
+就方才的savings 被指定為 nil 來說，代表著 savings 在底層儲存的型態為 nil，而值沒有指定，
+這樣的介面實例稱為 nil interface，因為沒有型態資訊，也就不能透過 nil interface 呼叫方法。
+
+### 空介面
+那麼，如果想要建立一個實例容器，可以收集各種類型的實例，要怎麼做呢？
+答案就是透過空介面，也就是沒有定義任何行為的 interface {}。
+
+```
+package main
+
+import "fmt"
+
+type Cat struct{}
+
+func main() {
+    instances := [](interface{}){
+        &Cat{},
+        [...]int{1, 2, 3, 4, 5, 6},
+        map[string]int{"walter1": 123456, "walter2": 654321},
+    }
+
+    for _, instance := range instances {
+        fmt.Println(instance)
+    }
+}
+```
+
+如果你查看 fmt.Println 的文件說明，可以發現，它的參數類型就是 interface {}：
+
+```
+func Print(a ...interface{}) (n int, err error)
+func Printf(format string, a ...interface{}) (n int, err error)
+func Println(a ...interface{}) (n int, err error)
+```
+
+## 型態斷言
 
