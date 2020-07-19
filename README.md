@@ -1017,3 +1017,49 @@ getter invoked: x (0x104382e0) = 20
 
 ## defer、panic、recover
 
+就許多現代語言而言，例外處理機制是基本特性之一，然而，例外處理是好是壞，一直以來存在著各種不同的意見，
+在 Go 語言中，沒有例外處理機制，取而代之的，是運用 defer、panic、recover 來滿足類似的處理需求。
+
+### defer 延遲執行
+在 Go 語言中，可以使用 defer 指定某個函式延遲執行，那麼延遲到哪個時機？簡單來說，在函式 return 之前，例如：
+
+```
+package main
+
+import "fmt"
+
+func deferredFunc() {
+    fmt.Println("deferredFunc")
+}
+
+func main() {
+    defer deferredFunc()
+    fmt.Println("Hello, 世界")
+}
+```
+
+這個範例執行時，deferredFunc() 前加上了 defer，因此，會在 main() 函式 return 前執行，
+結果就是先顯示了 "Hello, 世界"，才顯示 "deferredFunc"。
+
+如果有多個函式被 defer，那麼在函式 return 前，會依 defer 的相反順序執行，也就是 LIFO。
+
+### 使用 defer 清除資源
+... 詳細請自行爬文 ^_^
+
+### panic
+... 詳細請自行爬文 ^_^
+
+### recover 恢復流程
+如果發生了 panic，而你必須做一些處理，可以使用 recover，這個函式必須在被 defer 的函式中執行才有效果，
+若在被 defer 的函式外執行，recover 一定是傳回 nil。
+
+... 詳細請自行爬文 ^_^
+
+什麼時候該用 error？什麼時候該用 panic？在 Go 的慣例中，鼓勵你使用 error，明確地進行錯誤檢查，
+然而，就如方才所言，巢狀且深層的呼叫時，使用 panic 會比較便於傳播錯誤，
+就 Go 的慣例來說，是以套件為界限，於套件之中，必要時可以使用 panic，而套件公開的函式，
+建議以 error 來回報錯誤，若套件公開的函式可能會收到 panic，建議使用 recover 捕捉，並轉換為 error。
+
+## 結構入門
+
+
