@@ -26,6 +26,12 @@ Go 2.0版本將支援泛型，對於斷言的存在，則持負面態度，同�
 
 不同於Java，Go原生提供了關聯陣列（也稱為雜湊表（Hashes）或字典（Dictionaries）），就像字串類型一樣。
 
+## Go 的優缺點
++ 性能(機器代碼)
+> Go 極其地快。其性能與 Java 或 C++相似。在我們的使用中，Go 一般比 Python 要快 30 倍。
+
+[PHP轉Golang一些感想](https://www.jishuwen.com/d/2j9e/zh-tw)
+
 ## 來個 Hello, World 如何
 ```
 // main.go
