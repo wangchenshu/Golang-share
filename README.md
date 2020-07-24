@@ -118,7 +118,7 @@ func main() {
 ```
 
 ### 遠端套件
-由於 Go 的 workspace 設置，都必須是如此規範，因此，
+由於 Go 的 workspace設置，都必須是如此規範，因此，
 若你想將原始碼發佈給他人使用時就很方便，例如，
 你可以建立 src/github.com/walter 目錄，
 然後將方才的 goexample 目錄移到 src/github.com/walter 當中，
@@ -1884,6 +1884,87 @@ value.(type) 這樣的語法，只能用在 switch 之中。
 
 ## 介面組合
 詊請請參考: [介面組合](https://openhome.cc/Gossip/Go/InterfaceComposition.html)
+
+## Go 熱門的 Web Framework
+Go 是一個快速增長的開源編程語言，用於構建簡單、快速和可靠的軟件。點這裡看有哪些大公司在使用Go語言來構建他們的服務。
+
+本文提供了所有必要的信息，以幫助開發人員了解使用Go語言開發Web應用程序的最佳選項。 。
+
+本文包含了最詳細的框架比較，通過盡可能多的角度(人氣，社區支持，內置功能等)來比較最知名的幾個Web 框架。
+
+### Beego
+一個Go語言下開源的，高性能Web框架
+
+Beego 是一個快速開發 Go 應用的 HTTP 框架，他可以用來快速開發 API、Web 及後端服務等各種應用，
+
+是一個 RESTful 的框架，主要設計靈感來源於 tornado、sinatra 和 flask 這三個框架，
+
+但是結合了 Go 本身的一些特性（interface、struct 嵌入等）而設計的一個框架。
+
+- https://github.com/astaxie/beego
+- https://beego.me
+
+### Buffalo
+一個Go語言下快速Web開發框架
+
+- https://github.com/gobuffalo/buffalo
+- https://gobuffalo.io
+
+### Echo
+
+一個高性能，極簡的Web框架
+
+- https://github.com/labstack/echo
+- https://echo.labstack.com
+
+### Gin
+
+一個Go語言寫的HTTP Web框架。它提供了Martini風格的API並有更好的性能。
+
+Gin 是用 Go 編寫的一個 Web 應用框架，對比其它主流的同類框架，他有更好的性能和更快的路由。
+
+由於其本身只是在官方 net/http 包的基礎上做的完善，所以理解和上手很平滑。如果你現在開始做一套新的Api，我十分推薦你使用它。
+
+- https://github.com/gin-gonic/gin
+- https://gin-gonic.github.io/gin
+
+### Iris
+
+目前發展最快的Go Web框架。提供完整的MVC功能並且面向未來。
+
+- https://github.com/kataras/iris
+- https://iris-go.com
+
+### Revel
+
+一個高生產率，全棧Go語言的Web框架。
+
+- https://github.com/revel/revel
+- https://revel.github.io
+
+## ORM - Object Relational Mapping (物件關係對映)
+### gorm
+- 全功能 ORM (無限接近)
+- 關聯（包含一個，包含多個，屬於，多對多，多態）
+- 鉤子 (在創建/保存/更新/刪除/查找之前或之後)
+- 預加載
+- 事務
+- 複合主鍵
+- SQL 生成器
+- 數據庫自動遷移
+- 自定義日誌
+- 可擴展性, 可基於 GORM 回調編寫插件
+- 所有功能都被測試覆蓋
+- 開發者友好
+
+#### 相關連結
+- [gorm.io](https://gorm.io/)
+- [中文指南](http://gorm.io/zh_CN/)
+- [github](https://github.com/go-gorm/gorm)
+
+### xorm
+#### 相關連結
+- [github](https://github.com/xormplus/xorm)
 
 ## 完... XD
 
